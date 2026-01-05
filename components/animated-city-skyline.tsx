@@ -138,7 +138,7 @@ export function AnimatedCitySkyline() {
 	}, []);
 
 	return (
-		<div className="absolute bottom-0 left-0 right-0 h-[40%] min-h-[250px]">
+		<div className="md:absolute fixed bottom-0 left-0 right-0 h-[40%] min-h-[250px] pointer-events-none">
 			<svg
 				width="100%"
 				height="100%"

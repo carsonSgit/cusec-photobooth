@@ -26,8 +26,8 @@ export const metadata: Metadata = {
 		title: "CUSEC Photobooth",
 	},
 	icons: {
-		icon: "/icon-192x192.png",
-		apple: "/icon-192x192.png",
+		icon: "/favicon.png",
+		apple: "/apple-touch-icon.png",
 	},
 };
 
