@@ -90,7 +90,7 @@ export function SaveOptions() {
   if (isGenerating) {
     return (
       <motion.div 
-        className="min-h-screen bg-white relative flex items-center justify-center p-4"
+        className="min-h-screen bg-white relative overflow-y-auto flex items-center justify-center p-4"
         variants={pageVariants}
         initial="initial"
         animate="animate"
@@ -115,7 +115,7 @@ export function SaveOptions() {
   if (error) {
     return (
       <motion.div 
-        className="min-h-screen bg-white relative flex items-center justify-center p-4"
+        className="min-h-screen bg-white relative overflow-y-auto flex items-center justify-center p-4"
         variants={pageVariants}
         initial="initial"
         animate="animate"
@@ -133,7 +133,7 @@ export function SaveOptions() {
 
   return (
     <motion.div 
-      className="h-screen bg-white relative overflow-hidden"
+      className="min-h-screen bg-white relative overflow-y-auto"
       variants={pageVariants}
       initial="initial"
       animate="animate"

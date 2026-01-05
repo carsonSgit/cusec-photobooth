@@ -11,7 +11,7 @@ export default function Home() {
   const currentScreen = usePhotoboothStore((state) => state.currentScreen);
 
   return (
-    <main className="min-h-screen overflow-hidden">
+    <main className="min-h-screen bg-cusec-navy">
       <AnimatePresence mode="wait">
         {currentScreen === 'landing' && <LandingScreen key="landing" />}
         {currentScreen === 'camera' && <CameraCapture key="camera" />}

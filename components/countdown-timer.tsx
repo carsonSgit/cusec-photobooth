@@ -13,6 +13,10 @@ export function CountdownTimer({ onComplete, duration = 3 }: CountdownTimerProps
   const [count, setCount] = useState(duration);
 
   useEffect(() => {
+    setCount(duration);
+  }, [duration]);
+
+  useEffect(() => {
     if (count === 0) {
       onComplete();
       return;
@@ -42,11 +46,6 @@ export function CountdownTimer({ onComplete, duration = 3 }: CountdownTimerProps
               <div className="text-[200px] font-display font-bold bg-gradient-to-br from-cusec-red via-white to-cusec-navy bg-clip-text text-transparent leading-none">
                 {count}
               </div>
-              <motion.div 
-                className="absolute inset-0 border-4 border-cusec-red rounded-full opacity-50"
-                animate={{ scale: [1, 1.2], opacity: [0.5, 0] }}
-                transition={{ duration: 1, repeat: Infinity }}
-              />
             </motion.div>
           ) : (
             <motion.div 

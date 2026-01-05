@@ -46,7 +46,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${spaceGrotesk.variable} ${jost.variable} antialiased`}>{children}</body>
+      <body className={`${spaceGrotesk.variable} ${jost.variable} antialiased bg-cusec-navy`}>{children}</body>
     </html>
   );
 }

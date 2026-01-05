@@ -12,7 +12,7 @@ export function LandingScreen() {
 
   return (
     <div 
-      className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-4"
+      className="min-h-screen relative overflow-y-auto flex flex-col items-center justify-center p-4"
     >
       <CusecBackground />
 
@@ -48,7 +48,7 @@ export function LandingScreen() {
           <div>
             <Button
               size="lg"
-              className="w-full mb-6 text-lg h-14 bg-white text-cusec-navy font-display font-semibold"
+              className="w-full mb-6 text-lg h-14 bg-white text-cusec-navy font-display font-semibold hover:bg-white/90"
               onClick={() => setCurrentScreen('camera')}
             >
               Take Photos

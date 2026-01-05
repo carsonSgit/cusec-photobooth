@@ -23,6 +23,10 @@ export function CameraCapture() {
     };
   }, [startCamera, stopCamera]);
 
+  const startCountdown = useCallback(() => {
+    setIsCountingDown(true);
+  }, []);
+
   useEffect(() => {
     if (photos.length === 0) {
       setTimeout(() => {
@@ -40,11 +44,7 @@ export function CameraCapture() {
         setCurrentScreen('save');
       }, 1000);
     }
-  }, [photos.length]);
-
-  const startCountdown = useCallback(() => {
-    setIsCountingDown(true);
-  }, []);
+  }, [photos.length, startCountdown, stopCamera, setCurrentScreen]);
 
   const handleCountdownComplete = useCallback(() => {
     setIsCountingDown(false);
@@ -107,7 +107,7 @@ export function CameraCapture() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          Photo {photos.length + 1} of 3
+          Photo {Math.min(photos.length + 1, 3)} of 3
         </motion.div>
         <Button
           variant="ghost"
