@@ -42,15 +42,40 @@ export function SaveOptions() {
 
     setIsDownloading(true);
     try {
-      const link = document.createElement('a');
-      link.href = photoStrip;
-      link.download = `cusec-2026-photobooth-${Date.now()}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      
+      if (isIOS && navigator.share) {
+        const response = await fetch(photoStrip);
+        const blob = await response.blob();
+        const file = new File([blob], `cusec-2026-photobooth-${Date.now()}.png`, { type: 'image/png' });
+        
+        await navigator.share({
+          files: [file],
+          title: 'CUSEC 2026 Photo Booth',
+          text: 'Check out my photo from CUSEC 2026! #CUSEC2026'
+        });
+      } else {
+        const link = document.createElement('a');
+        link.href = photoStrip;
+        link.download = `cusec-2026-photobooth-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
       setDownloaded(true);
     } catch (error) {
       console.error('Download failed:', error);
+      try {
+        const link = document.createElement('a');
+        link.href = photoStrip;
+        link.download = `cusec-2026-photobooth-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setDownloaded(true);
+      } catch (fallbackError) {
+        console.error('Fallback download also failed:', fallbackError);
+      }
     } finally {
       setIsDownloading(false);
     }
