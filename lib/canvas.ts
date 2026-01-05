@@ -21,7 +21,7 @@ export async function generatePhotoStrip(photos: string[]): Promise<string> {
 
     const headerHeight = 80;
     const footerHeight = 60;
-    const photoGap = 16;
+    const photoGap = 32;
     const borderWidth = 2;
 
     let loadedImages = 0;
@@ -50,7 +50,7 @@ export async function generatePhotoStrip(photos: string[]): Promise<string> {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.fillStyle = '#000000';
-      ctx.font = 'bold 36px Arial, sans-serif';
+      ctx.font = 'bold 52px Arial, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('CUSEC 2026', canvas.width / 2, headerHeight / 2);
@@ -68,10 +68,6 @@ export async function generatePhotoStrip(photos: string[]): Promise<string> {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('CUSEC 2026', canvas.width / 2, footerY + (footerHeight / 2));
-
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = borderWidth;
-      ctx.strokeRect(borderWidth / 2, borderWidth / 2, canvas.width - borderWidth, canvas.height - borderWidth);
 
       resolve(canvas.toDataURL('image/png'));
     };

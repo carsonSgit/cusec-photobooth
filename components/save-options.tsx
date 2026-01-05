@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/card';
 import { usePhotoboothStore } from '@/lib/store';
 import { generatePhotoStrip } from '@/lib/canvas';
 import { pageVariants } from '@/lib/animations';
-import PixelBlast from '@/components/PixelBlast';
+import { CusecBackground } from '@/components/cusec-background';
 
 export function SaveOptions() {
   const { photos, photoStrip, setPhotoStrip, reset } = usePhotoboothStore();
@@ -90,31 +90,12 @@ export function SaveOptions() {
   if (isGenerating) {
     return (
       <motion.div 
-        className="min-h-screen bg-black relative flex items-center justify-center p-4"
+        className="min-h-screen relative flex items-center justify-center p-4"
         variants={pageVariants}
         initial="initial"
         animate="animate"
       >
-        <div className="absolute inset-0">
-          <PixelBlast
-            variant="square"
-            pixelSize={4}
-            color="#A40B0D"
-            patternScale={2}
-            patternDensity={1}
-            pixelSizeJitter={0}
-            enableRipples
-            rippleSpeed={0.3}
-            rippleThickness={0.1}
-            rippleIntensityScale={1}
-            liquid={false}
-            speed={0.5}
-            edgeFade={0.25}
-            transparent
-            className=""
-            style={{}}
-          />
-        </div>
+        <CusecBackground />
         <Card className="glass-strong border-0 shadow-premium-lg p-8 text-center relative z-10">
           <div className="relative w-20 h-20 mx-auto mb-6">
             <motion.div
@@ -134,31 +115,12 @@ export function SaveOptions() {
   if (error) {
     return (
       <motion.div 
-        className="min-h-screen bg-black relative flex items-center justify-center p-4"
+        className="min-h-screen relative flex items-center justify-center p-4"
         variants={pageVariants}
         initial="initial"
         animate="animate"
       >
-        <div className="absolute inset-0">
-          <PixelBlast
-            variant="square"
-            pixelSize={4}
-            color="#A40B0D"
-            patternScale={2}
-            patternDensity={1}
-            pixelSizeJitter={0}
-            enableRipples
-            rippleSpeed={0.3}
-            rippleThickness={0.1}
-            rippleIntensityScale={1}
-            liquid={false}
-            speed={0.5}
-            edgeFade={0.25}
-            transparent
-            className=""
-            style={{}}
-          />
-        </div>
+        <CusecBackground />
         <Card className="glass-strong border-0 shadow-premium-lg p-8 text-center max-w-md relative z-10">
           <p className="text-lg text-red-300 mb-4 font-display font-semibold">{error}</p>
           <Button onClick={handleStartOver} className="bg-white text-cusec-navy hover:bg-white/90">
@@ -171,32 +133,13 @@ export function SaveOptions() {
 
   return (
     <motion.div 
-      className="h-screen bg-black relative overflow-hidden"
+      className="h-screen relative overflow-hidden"
       variants={pageVariants}
       initial="initial"
       animate="animate"
       exit="exit"
     >
-      <div className="absolute inset-0">
-        <PixelBlast
-          variant="square"
-          pixelSize={4}
-          color="#A40B0D"
-          patternScale={2}
-          patternDensity={1}
-          pixelSizeJitter={0}
-          enableRipples
-          rippleSpeed={0.3}
-          rippleThickness={0.1}
-          rippleIntensityScale={1}
-          liquid={false}
-          speed={0.5}
-          edgeFade={0.25}
-          transparent
-          className=""
-          style={{}}
-        />
-      </div>
+      <CusecBackground />
       <div className="relative z-10 flex flex-col lg:flex-row h-full">
         <div className="lg:w-2/5 flex items-center justify-center p-4 lg:p-6">
           <motion.div

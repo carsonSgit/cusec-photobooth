@@ -6,7 +6,7 @@ import { Camera, Download, Share2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePhotoboothStore } from '@/lib/store';
 import { pageVariants, cardVariants, containerVariants, buttonVariants } from '@/lib/animations';
-import PixelBlast from '@/components/PixelBlast';
+import { CusecBackground } from '@/components/cusec-background';
 
 export function LandingScreen() {
   const setCurrentScreen = usePhotoboothStore((state) => state.setCurrentScreen);
@@ -15,26 +15,7 @@ export function LandingScreen() {
     <div 
       className="min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-4"
     >
-      <div className="absolute inset-0 bg-black">
-        <PixelBlast
-          variant="square"
-          pixelSize={4}
-          color="#A40B0D"
-          patternScale={2}
-          patternDensity={1}
-          pixelSizeJitter={0}
-          enableRipples
-          rippleSpeed={0.3}
-          rippleThickness={0.1}
-          rippleIntensityScale={1}
-          liquid={false}
-          speed={0.5}
-          edgeFade={0.25}
-          transparent
-          className=""
-          style={{}}
-        />
-      </div>
+      <CusecBackground />
 
       <div className="relative z-10 max-w-md w-full">
         <div 
