@@ -1,25 +1,25 @@
 {
-  "name": "CUSEC 2026 Photobooth",
-  "short_name": "CUSEC Photobooth",
-  "description": "Capture and share your CUSEC 2026 conference memories",
-  "theme_color": "#0ea5e9",
-  "background_color": "#0c4a6e",
-  "display": "standalone",
-  "orientation": "portrait",
-  "scope": "/",
-  "start_url": "/",
-  "icons": [
-    {
-      "src": "/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable any"
-    }
-  ]
+	"name": "CUSEC 2026 Photobooth",
+	"short_name": "CUSEC Photobooth",
+	"description": "Capture and share your CUSEC 2026 conference memories",
+	"theme_color": "#0ea5e9",
+	"background_color": "#0c4a6e",
+	"display": "standalone",
+	"orientation": "portrait",
+	"scope": "/",
+	"start_url": "/",
+	"icons": [
+		{
+			"src": "/icon-192x192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "maskable any"
+		},
+		{
+			"src": "/icon-512x512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable any"
+		}
+	]
 }

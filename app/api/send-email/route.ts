@@ -1,36 +1,38 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import { type NextRequest, NextResponse } from "next/server";
+import { Resend } from "resend";
 
 export async function POST(request: NextRequest) {
-  try {
-    const { email, photoStrip } = await request.json();
+	try {
+		const { email, photoStrip } = await request.json();
 
-    if (!email || !photoStrip) {
-      return NextResponse.json(
-        { error: 'Email and photo strip are required' },
-        { status: 400 }
-      );
-    }
+		if (!email || !photoStrip) {
+			return NextResponse.json(
+				{ error: "Email and photo strip are required" },
+				{ status: 400 },
+			);
+		}
 
-    // Check if Resend API key is configured
-    if (!process.env.RESEND_API_KEY) {
-      return NextResponse.json(
-        { error: 'Email service is not configured. Please set RESEND_API_KEY.' },
-        { status: 503 }
-      );
-    }
+		// Check if Resend API key is configured
+		if (!process.env.RESEND_API_KEY) {
+			return NextResponse.json(
+				{
+					error: "Email service is not configured. Please set RESEND_API_KEY.",
+				},
+				{ status: 503 },
+			);
+		}
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
+		const resend = new Resend(process.env.RESEND_API_KEY);
 
-    // Convert base64 to buffer
-    const base64Data = photoStrip.replace(/^data:image\/\w+;base64,/, '');
-    const buffer = Buffer.from(base64Data, 'base64');
+		// Convert base64 to buffer
+		const base64Data = photoStrip.replace(/^data:image\/\w+;base64,/, "");
+		const buffer = Buffer.from(base64Data, "base64");
 
-    const { data, error } = await resend.emails.send({
-      from: process.env.FROM_EMAIL || 'onboarding@resend.dev',
-      to: email,
-      subject: 'Your CUSEC 2026 Photobooth Memories! 📸',
-      html: `
+		const { data, error } = await resend.emails.send({
+			from: process.env.FROM_EMAIL || "onboarding@resend.dev",
+			to: email,
+			subject: "Your CUSEC 2026 Photobooth Memories! 📸",
+			html: `
         <!DOCTYPE html>
         <html>
           <head>
@@ -139,25 +141,28 @@ export async function POST(request: NextRequest) {
           </body>
         </html>
       `,
-      attachments: [
-        {
-          filename: `cusec-2026-photobooth-${Date.now()}.png`,
-          content: buffer,
-        },
-      ],
-    });
+			attachments: [
+				{
+					filename: `cusec-2026-photobooth-${Date.now()}.png`,
+					content: buffer,
+				},
+			],
+		});
 
-    if (error) {
-      console.error('Resend error:', error);
-      return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
-    }
+		if (error) {
+			console.error("Resend error:", error);
+			return NextResponse.json(
+				{ error: "Failed to send email" },
+				{ status: 500 },
+			);
+		}
 
-    return NextResponse.json({ success: true, data });
-  } catch (error) {
-    console.error('Email send error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
+		return NextResponse.json({ success: true, data });
+	} catch (error) {
+		console.error("Email send error:", error);
+		return NextResponse.json(
+			{ error: "Internal server error" },
+			{ status: 500 },
+		);
+	}
 }

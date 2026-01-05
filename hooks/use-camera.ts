@@ -1,117 +1,123 @@
-import { useRef, useState, useCallback } from 'react';
+import { useCallback, useRef, useState } from "react";
 
 export function useCamera() {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
+	const videoRef = useRef<HTMLVideoElement | null>(null);
+	const streamRef = useRef<MediaStream | null>(null);
+	const abortControllerRef = useRef<AbortController | null>(null);
+	const [isStreaming, setIsStreaming] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+	const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
 
-  const startCamera = useCallback(async () => {
-    // Cancel any previous camera start attempt
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    
-    const abortController = new AbortController();
-    abortControllerRef.current = abortController;
-    
-    try {
-      setError(null);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: false,
-      });
+	const startCamera = useCallback(async () => {
+		// Cancel any previous camera start attempt
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort();
+		}
 
-      // Check if this request was aborted while waiting for camera
-      if (abortController.signal.aborted) {
-        stream.getTracks().forEach((track) => track.stop());
-        return;
-      }
+		const abortController = new AbortController();
+		abortControllerRef.current = abortController;
 
-      streamRef.current = stream;
+		try {
+			setError(null);
+			const stream = await navigator.mediaDevices.getUserMedia({
+				video: { facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
+				audio: false,
+			});
 
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        
-        try {
-          await videoRef.current.play();
-          // Only set streaming if not aborted
-          if (!abortController.signal.aborted) {
-            setIsStreaming(true);
-          }
-        } catch (playError) {
-          // AbortError is expected when component unmounts or camera restarts
-          if (playError instanceof Error && playError.name === 'AbortError') {
-            console.log('Camera play() aborted - this is expected during cleanup');
-            return;
-          }
-          throw playError;
-        }
-      }
-    } catch (err) {
-      // Don't set error state if this was an intentional abort
-      if (abortController.signal.aborted) {
-        return;
-      }
-      console.error('Error accessing camera:', err);
-      setError('Failed to access camera. Please grant camera permissions.');
-      setIsStreaming(false);
-    }
-  }, [facingMode]);
+			// Check if this request was aborted while waiting for camera
+			if (abortController.signal.aborted) {
+				for (const track of stream.getTracks()) {
+					track.stop();
+				}
+				return;
+			}
 
-  const stopCamera = useCallback(() => {
-    // Abort any pending camera start
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-    
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    setIsStreaming(false);
-  }, []);
+			streamRef.current = stream;
 
-  const switchCamera = useCallback(() => {
-    stopCamera();
-    setFacingMode((prev) => (prev === 'user' ? 'environment' : 'user'));
-  }, [stopCamera]);
+			if (videoRef.current) {
+				videoRef.current.srcObject = stream;
 
-  const capturePhoto = useCallback((): string | null => {
-    if (!videoRef.current || !isStreaming) return null;
+				try {
+					await videoRef.current.play();
+					// Only set streaming if not aborted
+					if (!abortController.signal.aborted) {
+						setIsStreaming(true);
+					}
+				} catch (playError) {
+					// AbortError is expected when component unmounts or camera restarts
+					if (playError instanceof Error && playError.name === "AbortError") {
+						console.log(
+							"Camera play() aborted - this is expected during cleanup",
+						);
+						return;
+					}
+					throw playError;
+				}
+			}
+		} catch (err) {
+			// Don't set error state if this was an intentional abort
+			if (abortController.signal.aborted) {
+				return;
+			}
+			console.error("Error accessing camera:", err);
+			setError("Failed to access camera. Please grant camera permissions.");
+			setIsStreaming(false);
+		}
+	}, [facingMode]);
 
-    const video = videoRef.current;
-    const canvas = document.createElement('canvas');
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+	const stopCamera = useCallback(() => {
+		// Abort any pending camera start
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort();
+			abortControllerRef.current = null;
+		}
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return null;
+		if (streamRef.current) {
+			for (const track of streamRef.current.getTracks()) {
+				track.stop();
+			}
+			streamRef.current = null;
+		}
+		if (videoRef.current) {
+			videoRef.current.srcObject = null;
+		}
+		setIsStreaming(false);
+	}, []);
 
-    // Flip horizontally if using front camera
-    if (facingMode === 'user') {
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-    }
+	const switchCamera = useCallback(() => {
+		stopCamera();
+		setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
+	}, [stopCamera]);
 
-    ctx.drawImage(video, 0, 0);
-    return canvas.toDataURL('image/jpeg', 0.9);
-  }, [isStreaming, facingMode]);
+	const capturePhoto = useCallback((): string | null => {
+		if (!videoRef.current || !isStreaming) return null;
 
-  return {
-    videoRef,
-    isStreaming,
-    error,
-    facingMode,
-    startCamera,
-    stopCamera,
-    switchCamera,
-    capturePhoto,
-  };
+		const video = videoRef.current;
+		const canvas = document.createElement("canvas");
+		canvas.width = video.videoWidth;
+		canvas.height = video.videoHeight;
+
+		const ctx = canvas.getContext("2d");
+		if (!ctx) return null;
+
+		// Flip horizontally if using front camera
+		if (facingMode === "user") {
+			ctx.translate(canvas.width, 0);
+			ctx.scale(-1, 1);
+		}
+
+		ctx.drawImage(video, 0, 0);
+		return canvas.toDataURL("image/jpeg", 0.9);
+	}, [isStreaming, facingMode]);
+
+	return {
+		videoRef,
+		isStreaming,
+		error,
+		facingMode,
+		startCamera,
+		stopCamera,
+		switchCamera,
+		capturePhoto,
+	};
 }
