@@ -2,10 +2,9 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Camera, Download, Share2, Sparkles } from 'lucide-react';
+import { Camera, Download, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePhotoboothStore } from '@/lib/store';
-import { pageVariants, cardVariants, containerVariants, buttonVariants } from '@/lib/animations';
 import { CusecBackground } from '@/components/cusec-background';
 
 export function LandingScreen() {
