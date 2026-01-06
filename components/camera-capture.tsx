@@ -73,7 +73,7 @@ export function CameraCapture() {
 
 	if (error) {
 		return (
-			<div className="min-h-screen bg-black flex items-center justify-center p-4">
+			<div className="h-screen-safe bg-black flex items-center justify-center p-4">
 				<div className="text-center text-white">
 					<p className="text-xl mb-4 font-display">{error}</p>
 					<Button onClick={handleCancel}>Go Back</Button>
@@ -83,7 +83,7 @@ export function CameraCapture() {
 	}
 
 	return (
-		<div className="min-h-screen bg-black relative overflow-hidden overflow-locked landscape:flex landscape:items-center landscape:justify-center">
+		<div className="h-screen-safe bg-black relative overflow-hidden overflow-locked landscape:flex landscape:items-center landscape:justify-center">
 			<video
 				ref={videoRef}
 				className={`absolute inset-0 w-full h-full object-cover ${

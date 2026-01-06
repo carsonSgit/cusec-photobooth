@@ -5,6 +5,7 @@ export function useCamera() {
 	const streamRef = useRef<MediaStream | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const orientationQueryRef = useRef<MediaQueryList | null>(null);
+	const orientationHandlerRef = useRef<(() => void) | null>(null);
 	const [isStreaming, setIsStreaming] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
@@ -12,11 +13,12 @@ export function useCamera() {
 	const getVideoConstraints = useCallback((currentFacingMode: "user" | "environment") => {
 		const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 
+		// Request high resolution but don't force aspect ratio
+		// Let the camera use its native ratio to minimize cropping on various device screens
 		return {
 			facingMode: currentFacingMode,
-			width: { ideal: isLandscape ? 1920 : 1080 },
-			height: { ideal: isLandscape ? 1080 : 1920 },
-			aspectRatio: { ideal: isLandscape ? 16 / 9 : 9 / 16 },
+			width: { ideal: isLandscape ? 1920 : 1080, min: 640 },
+			height: { ideal: isLandscape ? 1080 : 1920, min: 480 },
 		};
 	}, []);
 
@@ -65,6 +67,8 @@ export function useCamera() {
 								}, 100);
 							};
 
+							// Store handler reference for proper cleanup
+							orientationHandlerRef.current = handleOrientationChange;
 							orientationQuery.addEventListener("change", handleOrientationChange);
 							orientationQueryRef.current = orientationQuery;
 						}
@@ -99,9 +103,10 @@ export function useCamera() {
 		}
 
 		// Clean up orientation listener
-		if (orientationQueryRef.current) {
-			orientationQueryRef.current.removeEventListener("change", () => {});
+		if (orientationQueryRef.current && orientationHandlerRef.current) {
+			orientationQueryRef.current.removeEventListener("change", orientationHandlerRef.current);
 			orientationQueryRef.current = null;
+			orientationHandlerRef.current = null;
 		}
 
 		if (streamRef.current) {

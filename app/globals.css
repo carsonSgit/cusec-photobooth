@@ -249,6 +249,17 @@ textarea {
 		animation-delay: 2s;
 	}
 
+	/* Full viewport height with mobile browser chrome support */
+	.h-screen-safe {
+		height: 100vh;
+		height: 100dvh;
+	}
+
+	.min-h-screen-safe {
+		min-height: 100vh;
+		min-height: 100dvh;
+	}
+
 	/* Landscape orientation support */
 	@media (orientation: landscape) {
 		.landscape-video {
