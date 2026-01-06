@@ -4,9 +4,21 @@ export function useCamera() {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const streamRef = useRef<MediaStream | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
+	const orientationQueryRef = useRef<MediaQueryList | null>(null);
 	const [isStreaming, setIsStreaming] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+
+	const getVideoConstraints = useCallback((currentFacingMode: "user" | "environment") => {
+		const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+
+		return {
+			facingMode: currentFacingMode,
+			width: { ideal: isLandscape ? 1920 : 1080 },
+			height: { ideal: isLandscape ? 1080 : 1920 },
+			aspectRatio: { ideal: isLandscape ? 16 / 9 : 9 / 16 },
+		};
+	}, []);
 
 	const startCamera = useCallback(async () => {
 		// Cancel any previous camera start attempt
@@ -20,7 +32,7 @@ export function useCamera() {
 		try {
 			setError(null);
 			const stream = await navigator.mediaDevices.getUserMedia({
-				video: { facingMode, width: { ideal: 1920 }, height: { ideal: 1080 } },
+				video: getVideoConstraints(facingMode),
 				audio: false,
 			});
 
@@ -42,6 +54,20 @@ export function useCamera() {
 					// Only set streaming if not aborted
 					if (!abortController.signal.aborted) {
 						setIsStreaming(true);
+
+						// Set up orientation change listener
+						if (!orientationQueryRef.current) {
+							const orientationQuery = window.matchMedia("(orientation: landscape)");
+							const handleOrientationChange = () => {
+								stopCamera();
+								setTimeout(() => {
+									startCamera();
+								}, 100);
+							};
+
+							orientationQuery.addEventListener("change", handleOrientationChange);
+							orientationQueryRef.current = orientationQuery;
+						}
 					}
 				} catch (playError) {
 					// AbortError is expected when component unmounts or camera restarts
@@ -63,13 +89,19 @@ export function useCamera() {
 			setError("Failed to access camera. Please grant camera permissions.");
 			setIsStreaming(false);
 		}
-	}, [facingMode]);
+	}, [facingMode, getVideoConstraints]);
 
 	const stopCamera = useCallback(() => {
 		// Abort any pending camera start
 		if (abortControllerRef.current) {
 			abortControllerRef.current.abort();
 			abortControllerRef.current = null;
+		}
+
+		// Clean up orientation listener
+		if (orientationQueryRef.current) {
+			orientationQueryRef.current.removeEventListener("change", () => {});
+			orientationQueryRef.current = null;
 		}
 
 		if (streamRef.current) {

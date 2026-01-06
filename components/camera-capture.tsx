@@ -83,7 +83,7 @@ export function CameraCapture() {
 	}
 
 	return (
-		<div className="min-h-screen bg-black relative overflow-hidden overflow-locked">
+		<div className="min-h-screen bg-black relative overflow-hidden overflow-locked landscape:flex landscape:items-center landscape:justify-center">
 			<video
 				ref={videoRef}
 				className={`absolute inset-0 w-full h-full object-cover ${
@@ -113,7 +113,7 @@ export function CameraCapture() {
 				<CountdownTimer onComplete={handleCountdownComplete} />
 			)}
 
-			<div className="absolute top-4 left-4 right-4 z-30 flex justify-between items-start">
+			<div className="absolute top-4 left-4 right-4 z-30 flex justify-between items-start landscape:top-2 landscape:left-2 landscape:right-2">
 				<motion.div
 					className="glass-dark text-white px-4 py-2 rounded-full shadow-premium font-display font-semibold"
 					initial={{ opacity: 0, y: -20 }}
@@ -132,7 +132,7 @@ export function CameraCapture() {
 			</div>
 
 			{photos.length > 0 && (
-				<div className="absolute top-20 left-4 right-4 z-30 flex gap-2 overflow-x-auto">
+				<div className="absolute top-20 left-4 right-4 z-30 flex gap-2 overflow-x-auto landscape:top-2 landscape:left-20 landscape:right-auto landscape:flex-col landscape:max-h-[calc(100vh-8rem)]">
 					{photos.map((photo, index) => (
 						<motion.div
 							key={photo}
@@ -141,7 +141,7 @@ export function CameraCapture() {
 							animate="animate"
 							className="relative shrink-0"
 						>
-							<div className="w-20 h-20 rounded-xl overflow-hidden shadow-premium-lg border-2 border-white/50">
+							<div className="w-20 h-20 rounded-xl overflow-hidden shadow-premium-lg border-2 border-white/50 landscape:w-16 landscape:h-16">
 								<img
 									src={photo}
 									alt={`Captured ${index + 1} of 3`}
@@ -170,7 +170,7 @@ export function CameraCapture() {
 				</div>
 			)}
 
-			<div className="absolute bottom-4 left-4 right-4 z-30 flex flex-col items-center gap-4">
+			<div className="absolute bottom-4 left-4 right-4 z-30 flex flex-col items-center gap-4 landscape:bottom-2 landscape:left-auto landscape:right-2">
 				<AnimatePresence mode="wait">
 					<motion.p
 						key={statusText}
