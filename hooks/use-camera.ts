@@ -113,29 +113,30 @@ export function useCamera(orientation: Orientation) {
 		const wantLandscape = orientation === "landscape";
 		
 		// Calculate the target crop dimensions based on user's orientation selection
+		// Using 4:3 for landscape and 3:4 for portrait (standard photo ratios, less aggressive cropping)
 		let cropWidth: number;
 		let cropHeight: number;
 		let cropX: number;
 		let cropY: number;
 		
 		if (wantLandscape) {
-			// User wants landscape (16:9 aspect ratio)
-			const targetAspect = 16 / 9;
+			// User wants landscape (4:3 aspect ratio)
+			const targetAspect = 4 / 3;
 			if (videoIsLandscape) {
-				// Video is already landscape - crop to 16:9
+				// Video is already landscape - crop to 4:3
 				const currentAspect = videoWidth / videoHeight;
 				if (currentAspect > targetAspect) {
-					// Video is wider than 16:9, crop width
+					// Video is wider than 4:3, crop width
 					cropHeight = videoHeight;
 					cropWidth = Math.round(videoHeight * targetAspect);
 				} else {
-					// Video is taller than 16:9, crop height
+					// Video is taller than 4:3, crop height
 					cropWidth = videoWidth;
 					cropHeight = Math.round(videoWidth / targetAspect);
 				}
 			} else {
-				// Video is portrait but user wants landscape - crop center to 16:9
-				// Use full width and calculate height for 16:9
+				// Video is portrait but user wants landscape - crop center to 4:3
+				// Use full width and calculate height for 4:3
 				cropWidth = videoWidth;
 				cropHeight = Math.round(videoWidth / targetAspect);
 				// Make sure we don't exceed video height
@@ -145,23 +146,23 @@ export function useCamera(orientation: Orientation) {
 				}
 			}
 		} else {
-			// User wants portrait (9:16 aspect ratio)
-			const targetAspect = 9 / 16;
+			// User wants portrait (3:4 aspect ratio)
+			const targetAspect = 3 / 4;
 			if (!videoIsLandscape) {
-				// Video is already portrait - crop to 9:16
+				// Video is already portrait - crop to 3:4
 				const currentAspect = videoWidth / videoHeight;
 				if (currentAspect > targetAspect) {
-					// Video is wider than 9:16, crop width
+					// Video is wider than 3:4, crop width
 					cropHeight = videoHeight;
 					cropWidth = Math.round(videoHeight * targetAspect);
 				} else {
-					// Video is taller than 9:16, crop height
+					// Video is taller than 3:4, crop height
 					cropWidth = videoWidth;
 					cropHeight = Math.round(videoWidth / targetAspect);
 				}
 			} else {
-				// Video is landscape but user wants portrait - crop center to 9:16
-				// Use full height and calculate width for 9:16
+				// Video is landscape but user wants portrait - crop center to 3:4
+				// Use full height and calculate width for 3:4
 				cropHeight = videoHeight;
 				cropWidth = Math.round(videoHeight * targetAspect);
 				// Make sure we don't exceed video width

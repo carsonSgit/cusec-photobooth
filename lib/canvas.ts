@@ -29,8 +29,8 @@ export async function generatePhotoStrip(photos: string[], orientation: Orientat
 		const borderWidth = 1; // Thin black border
 		const photoPaddingHorizontal = 30; // Horizontal padding for photos
 		
-		// Target aspect ratios based on orientation
-		const targetAspectRatio = orientation === "landscape" ? 16 / 9 : 9 / 16;
+		// Target aspect ratios based on orientation (4:3 for landscape, 3:4 for portrait)
+		const targetAspectRatio = orientation === "landscape" ? 4 / 3 : 3 / 4;
 
 		let loadedImages = 0;
 		const photoImages: HTMLImageElement[] = [];
