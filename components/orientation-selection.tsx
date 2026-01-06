@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Smartphone } from "lucide-react";
 import Image from "next/image";
 import { CusecBackground } from "@/components/cusec-background";
 import { Button } from "@/components/ui/button";
@@ -15,94 +15,63 @@ const cardVariants = {
 	tap: { scale: 0.98 },
 };
 
-const stripVariants = {
-	initial: { opacity: 0 },
-	animate: { opacity: 1 },
-};
-
 interface OrientationCardProps {
 	orientation: Orientation;
 	label: string;
 	description: string;
-	isSelected?: boolean;
 	onClick: () => void;
 	delay: number;
 }
 
-function PortraitStripPreview() {
+function PortraitCameraPreview() {
 	return (
-		<div className="relative w-full aspect-[9/16] max-w-[120px] mx-auto">
-			{/* Strip container */}
-			<div className="absolute inset-0 bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200">
-				{/* Header */}
-				<div className="h-[15%] bg-white flex items-center justify-center px-2 border-b border-gray-100">
-					<div className="flex items-center gap-1">
-						<div className="w-4 h-4 rounded-full bg-cusec-navy/20" />
-						<div className="text-[6px] font-bold text-cusec-navy leading-tight">
-							CUSEC
-						</div>
-					</div>
-				</div>
-
-				{/* Photos */}
-				<div className="h-[70%] flex flex-col gap-[2px] p-1">
-					{[0, 1, 2].map((i) => (
+		<div className="relative flex items-center justify-center py-4">
+			{/* Phone frame - portrait */}
+			<div className="relative w-20 h-32 bg-gray-900 rounded-2xl border-4 border-gray-700 shadow-xl overflow-hidden">
+				{/* Screen */}
+				<div className="absolute inset-1 bg-gradient-to-br from-cusec-sky/40 to-cusec-navy/60 rounded-xl flex items-center justify-center">
+					{/* Camera viewfinder indicator */}
+					<div className="w-12 h-16 border-2 border-white/40 rounded-lg flex items-center justify-center">
 						<motion.div
-							key={i}
-							className="flex-1 bg-gradient-to-br from-cusec-sky/30 to-cusec-navy/30 rounded-sm flex items-center justify-center"
-							initial={{ opacity: 0, scale: 0.8 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ delay: 0.3 + i * 0.1 }}
-						>
-							<div className="w-6 h-6 rounded-full border-2 border-white/50 flex items-center justify-center">
-								<span className="text-[8px] text-white font-bold">{i + 1}</span>
-							</div>
-						</motion.div>
-					))}
-				</div>
-
-				{/* Footer */}
-				<div className="h-[15%] bg-white flex items-center justify-center border-t border-gray-100">
-					<div className="text-[5px] font-semibold text-cusec-navy tracking-wider">
-						CUSEC 2026
+							className="w-8 h-10 border border-dashed border-white/60 rounded"
+							animate={{ opacity: [0.4, 1, 0.4] }}
+							transition={{ duration: 2, repeat: Infinity }}
+						/>
 					</div>
 				</div>
+				{/* Notch */}
+				<div className="absolute top-1 left-1/2 -translate-x-1/2 w-8 h-1.5 bg-gray-800 rounded-full" />
+			</div>
+			{/* Rotation indicator */}
+			<div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+				<Smartphone className="w-5 h-5 text-white/60" />
 			</div>
 		</div>
 	);
 }
 
-function LandscapeStripPreview() {
+function LandscapeCameraPreview() {
 	return (
-		<div className="relative w-full aspect-[16/9] max-w-[200px] mx-auto">
-			{/* Strip container */}
-			<div className="absolute inset-0 bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200">
-				{/* Header */}
-				<div className="h-[20%] bg-white flex items-center px-3 border-b border-gray-100">
-					<div className="flex items-center gap-1">
-						<div className="w-3 h-3 rounded-full bg-cusec-navy/20" />
-						<div className="text-[5px] font-bold text-cusec-navy">
-							CUSEC 2026
-						</div>
+		<div className="relative flex items-center justify-center py-4">
+			{/* Phone frame - landscape (rotated) */}
+			<div className="relative w-32 h-20 bg-gray-900 rounded-2xl border-4 border-gray-700 shadow-xl overflow-hidden">
+				{/* Screen */}
+				<div className="absolute inset-1 bg-gradient-to-br from-cusec-sky/40 to-cusec-navy/60 rounded-xl flex items-center justify-center">
+					{/* Camera viewfinder indicator */}
+					<div className="w-24 h-12 border-2 border-white/40 rounded-lg flex items-center justify-center">
+						<motion.div
+							className="w-16 h-8 border border-dashed border-white/60 rounded"
+							animate={{ opacity: [0.4, 1, 0.4] }}
+							transition={{ duration: 2, repeat: Infinity }}
+						/>
 					</div>
 				</div>
-
-				{/* Photos row */}
-				<div className="h-[80%] flex gap-[2px] p-1">
-					{[0, 1, 2].map((i) => (
-						<motion.div
-							key={i}
-							className="flex-1 bg-gradient-to-br from-cusec-sky/30 to-cusec-navy/30 rounded-sm flex items-center justify-center"
-							initial={{ opacity: 0, scale: 0.8 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ delay: 0.3 + i * 0.1 }}
-						>
-							<div className="w-5 h-5 rounded-full border-2 border-white/50 flex items-center justify-center">
-								<span className="text-[7px] text-white font-bold">{i + 1}</span>
-							</div>
-						</motion.div>
-					))}
-				</div>
+				{/* Notch (on left side when landscape) */}
+				<div className="absolute left-1 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-gray-800 rounded-full" />
+			</div>
+			{/* Rotation indicator */}
+			<div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+				<Smartphone className="w-5 h-5 text-white/60 rotate-90" />
 			</div>
 		</div>
 	);
@@ -130,19 +99,13 @@ function OrientationCard({
 			<div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
 			{/* Preview */}
-			<motion.div
-				className="relative z-10 mb-4"
-				variants={stripVariants}
-				initial="initial"
-				animate="animate"
-				transition={{ delay: delay + 0.2 }}
-			>
+			<div className="relative z-10 mb-4">
 				{orientation === "portrait" ? (
-					<PortraitStripPreview />
+					<PortraitCameraPreview />
 				) : (
-					<LandscapeStripPreview />
+					<LandscapeCameraPreview />
 				)}
-			</motion.div>
+			</div>
 
 			{/* Label */}
 			<div className="relative z-10 text-center">
@@ -228,10 +191,10 @@ export function OrientationSelection() {
 						/>
 					</div>
 					<h1 className="text-3xl font-display font-bold text-white mb-2">
-						Choose Your Style
+						How do you want to shoot?
 					</h1>
 					<p className="text-white/80 font-sans">
-						Select how you want your photostrip to look
+						Choose how to hold your phone for the photos
 					</p>
 				</motion.div>
 
@@ -240,14 +203,14 @@ export function OrientationSelection() {
 					<OrientationCard
 						orientation="portrait"
 						label="Portrait"
-						description="Classic vertical strip"
+						description="Hold your phone upright"
 						onClick={() => handleSelect("portrait")}
 						delay={0.3}
 					/>
 					<OrientationCard
 						orientation="landscape"
 						label="Landscape"
-						description="Wide horizontal strip"
+						description="Hold your phone sideways"
 						onClick={() => handleSelect("landscape")}
 						delay={0.4}
 					/>
@@ -260,7 +223,7 @@ export function OrientationSelection() {
 					animate={{ opacity: 1 }}
 					transition={{ delay: 0.6 }}
 				>
-					Tip: Portrait works great for printing, Landscape for sharing
+					Your photos will be captured in the orientation you choose
 				</motion.p>
 			</div>
 		</motion.div>

@@ -12,7 +12,7 @@ import { generatePhotoStrip } from "@/lib/canvas";
 import { usePhotoboothStore } from "@/lib/store";
 
 export function SaveOptions() {
-	const { photos, photoStrip, orientation, setPhotoStrip, reset } = usePhotoboothStore();
+	const { photos, photoStrip, setPhotoStrip, reset } = usePhotoboothStore();
 	const [email, setEmail] = useState("");
 	const [isSending, setIsSending] = useState(false);
 	const [sendStatus, setSendStatus] = useState<"idle" | "success" | "error">(
@@ -26,7 +26,7 @@ export function SaveOptions() {
 	useEffect(() => {
 		if (photos.length === 3 && !photoStrip) {
 			setIsGenerating(true);
-			generatePhotoStrip(photos, orientation)
+			generatePhotoStrip(photos)
 				.then((strip) => {
 					setPhotoStrip(strip);
 					setIsGenerating(false);

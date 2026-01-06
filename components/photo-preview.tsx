@@ -10,7 +10,7 @@ import { generatePhotoStrip } from "@/lib/canvas";
 import { usePhotoboothStore } from "@/lib/store";
 
 export function PhotoPreview() {
-	const { photos, photoStrip, orientation, setPhotoStrip, setCurrentScreen, clearPhotos } =
+	const { photos, photoStrip, setPhotoStrip, setCurrentScreen, clearPhotos } =
 		usePhotoboothStore();
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -18,7 +18,7 @@ export function PhotoPreview() {
 	useEffect(() => {
 		if (photos.length === 3 && !photoStrip) {
 			setIsGenerating(true);
-			generatePhotoStrip(photos, orientation)
+			generatePhotoStrip(photos)
 				.then((strip) => {
 					setPhotoStrip(strip);
 					setIsGenerating(false);
