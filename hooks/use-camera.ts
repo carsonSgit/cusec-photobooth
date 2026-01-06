@@ -10,13 +10,15 @@ export function useCamera(orientation: Orientation) {
 	const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
 
 	const getVideoConstraints = useCallback((currentFacingMode: "user" | "environment") => {
-		// Use the user-selected orientation instead of auto-detecting
-		const isLandscape = orientation === "landscape";
+		// Use aspectRatio constraint - this is better supported on mobile than width/height
+		// 4:3 for landscape, 3:4 (0.75) for portrait
+		const targetAspectRatio = orientation === "landscape" ? 4 / 3 : 3 / 4;
 
 		return {
 			facingMode: currentFacingMode,
-			width: { ideal: isLandscape ? 1920 : 1080, min: 640 },
-			height: { ideal: isLandscape ? 1080 : 1920, min: 480 },
+			aspectRatio: { ideal: targetAspectRatio },
+			width: { ideal: 1920 },
+			height: { ideal: 1920 },
 		};
 	}, [orientation]);
 
@@ -105,81 +107,11 @@ export function useCamera(orientation: Orientation) {
 		if (!videoRef.current || !isStreaming) return null;
 
 		const video = videoRef.current;
-		const videoWidth = video.videoWidth;
-		const videoHeight = video.videoHeight;
-		
-		// Determine if video is landscape or portrait based on actual dimensions
-		const videoIsLandscape = videoWidth > videoHeight;
-		const wantLandscape = orientation === "landscape";
-		
-		// Calculate the target crop dimensions based on user's orientation selection
-		// Using 4:3 for landscape and 3:4 for portrait (standard photo ratios, less aggressive cropping)
-		let cropWidth: number;
-		let cropHeight: number;
-		let cropX: number;
-		let cropY: number;
-		
-		if (wantLandscape) {
-			// User wants landscape (4:3 aspect ratio)
-			const targetAspect = 4 / 3;
-			if (videoIsLandscape) {
-				// Video is already landscape - crop to 4:3
-				const currentAspect = videoWidth / videoHeight;
-				if (currentAspect > targetAspect) {
-					// Video is wider than 4:3, crop width
-					cropHeight = videoHeight;
-					cropWidth = Math.round(videoHeight * targetAspect);
-				} else {
-					// Video is taller than 4:3, crop height
-					cropWidth = videoWidth;
-					cropHeight = Math.round(videoWidth / targetAspect);
-				}
-			} else {
-				// Video is portrait but user wants landscape - crop center to 4:3
-				// Use full width and calculate height for 4:3
-				cropWidth = videoWidth;
-				cropHeight = Math.round(videoWidth / targetAspect);
-				// Make sure we don't exceed video height
-				if (cropHeight > videoHeight) {
-					cropHeight = videoHeight;
-					cropWidth = Math.round(videoHeight * targetAspect);
-				}
-			}
-		} else {
-			// User wants portrait (3:4 aspect ratio)
-			const targetAspect = 3 / 4;
-			if (!videoIsLandscape) {
-				// Video is already portrait - crop to 3:4
-				const currentAspect = videoWidth / videoHeight;
-				if (currentAspect > targetAspect) {
-					// Video is wider than 3:4, crop width
-					cropHeight = videoHeight;
-					cropWidth = Math.round(videoHeight * targetAspect);
-				} else {
-					// Video is taller than 3:4, crop height
-					cropWidth = videoWidth;
-					cropHeight = Math.round(videoWidth / targetAspect);
-				}
-			} else {
-				// Video is landscape but user wants portrait - crop center to 3:4
-				// Use full height and calculate width for 3:4
-				cropHeight = videoHeight;
-				cropWidth = Math.round(videoHeight * targetAspect);
-				// Make sure we don't exceed video width
-				if (cropWidth > videoWidth) {
-					cropWidth = videoWidth;
-					cropHeight = Math.round(videoWidth / targetAspect);
-				}
-			}
-		}
-		
-		// Center the crop
-		cropX = Math.round((videoWidth - cropWidth) / 2);
-		cropY = Math.round((videoHeight - cropHeight) / 2);
-
 		const canvas = document.createElement("canvas");
-		canvas.width = cropWidth;
-		canvas.height = cropHeight;
+		
+		// Capture the full video frame - the camera should already have the right aspect ratio
+		canvas.width = video.videoWidth;
+		canvas.height = video.videoHeight;
 
 		const ctx = canvas.getContext("2d");
 		if (!ctx) return null;
@@ -190,15 +122,9 @@ export function useCamera(orientation: Orientation) {
 			ctx.scale(-1, 1);
 		}
 
-		// Draw the cropped region
-		ctx.drawImage(
-			video,
-			cropX, cropY, cropWidth, cropHeight,  // Source rectangle
-			0, 0, cropWidth, cropHeight            // Destination rectangle
-		);
-		
+		ctx.drawImage(video, 0, 0);
 		return canvas.toDataURL("image/jpeg", 0.9);
-	}, [isStreaming, facingMode, orientation]);
+	}, [isStreaming, facingMode]);
 
 	return {
 		videoRef,
