@@ -1,4 +1,6 @@
-export async function generatePhotoStrip(photos: string[]): Promise<string> {
+import type { Orientation } from "./store";
+
+export async function generatePhotoStrip(photos: string[], orientation: Orientation = "portrait"): Promise<string> {
 	if (photos.length !== 3) {
 		throw new Error("Exactly 3 photos are required");
 	}
@@ -26,6 +28,9 @@ export async function generatePhotoStrip(photos: string[]): Promise<string> {
 		const photoGap = 20; // White gaps between photos
 		const borderWidth = 1; // Thin black border
 		const photoPaddingHorizontal = 30; // Horizontal padding for photos
+		
+		// Target aspect ratios based on orientation
+		const targetAspectRatio = orientation === "landscape" ? 16 / 9 : 9 / 16;
 
 		let loadedImages = 0;
 		const photoImages: HTMLImageElement[] = [];
@@ -63,10 +68,10 @@ export async function generatePhotoStrip(photos: string[]): Promise<string> {
 			}
 
 			const photoWidth = canvasWidth - photoPaddingHorizontal * 2;
-			const photoHeights = photoImages.map((img) => {
-				const aspectRatio = img.height / img.width;
-				return Math.round(photoWidth * aspectRatio);
-			});
+			// Use the target aspect ratio for consistent photo heights
+			// This ensures all photos have the same height regardless of minor variations
+			const photoHeight = Math.round(photoWidth / targetAspectRatio);
+			const photoHeights = photoImages.map(() => photoHeight);
 
 			const totalPhotoHeight = photoHeights.reduce((sum, h) => sum + h, 0);
 			const totalGaps = photoGap * 2;
@@ -157,18 +162,36 @@ export async function generatePhotoStrip(photos: string[]): Promise<string> {
 			ctx.fillText(firstLine, textX, textStartY);
 			ctx.fillText(secondLine, textX, textStartY + lineHeight);
 
-			// Draw photos with horizontal padding
+			// Draw photos with horizontal padding (using cover-fit to handle aspect ratio differences)
 			let currentY = headerHeight;
 			photoImages.forEach((img, index) => {
-				const photoHeight = photoHeights[index];
+				const targetHeight = photoHeights[index];
+				
+				// Calculate cover-fit dimensions
+				const imgAspect = img.width / img.height;
+				const targetAspect = photoWidth / targetHeight;
+				
+				let srcX = 0;
+				let srcY = 0;
+				let srcWidth = img.width;
+				let srcHeight = img.height;
+				
+				if (imgAspect > targetAspect) {
+					// Image is wider than target - crop sides
+					srcWidth = img.height * targetAspect;
+					srcX = (img.width - srcWidth) / 2;
+				} else if (imgAspect < targetAspect) {
+					// Image is taller than target - crop top/bottom
+					srcHeight = img.width / targetAspect;
+					srcY = (img.height - srcHeight) / 2;
+				}
+				
 				ctx.drawImage(
 					img,
-					photoPaddingHorizontal,
-					currentY,
-					photoWidth,
-					photoHeight,
+					srcX, srcY, srcWidth, srcHeight,  // Source rectangle (cropped)
+					photoPaddingHorizontal, currentY, photoWidth, targetHeight,  // Destination rectangle
 				);
-				currentY += photoHeight + photoGap;
+				currentY += targetHeight + photoGap;
 			});
 
 			// Draw footer with CUSEC2026.png - centered

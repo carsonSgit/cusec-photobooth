@@ -15,10 +15,12 @@ export function PhotoPreview() {
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	const orientation = usePhotoboothStore((state) => state.orientation);
+
 	useEffect(() => {
 		if (photos.length === 3 && !photoStrip) {
 			setIsGenerating(true);
-			generatePhotoStrip(photos)
+			generatePhotoStrip(photos, orientation)
 				.then((strip) => {
 					setPhotoStrip(strip);
 					setIsGenerating(false);
@@ -29,7 +31,7 @@ export function PhotoPreview() {
 					setIsGenerating(false);
 				});
 		}
-	}, [photos, photoStrip, setPhotoStrip]);
+	}, [photos, photoStrip, setPhotoStrip, orientation]);
 
 	const handleRetake = () => {
 		clearPhotos();
