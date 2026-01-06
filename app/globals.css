@@ -250,14 +250,17 @@ textarea {
 	}
 
 	/* Full viewport height with mobile browser chrome support */
+	/* Uses JS-set --vh variable for Safari compatibility, with dvh and vh fallbacks */
 	.h-screen-safe {
 		height: 100vh;
 		height: 100dvh;
+		height: var(--vh, 100vh);
 	}
 
 	.min-h-screen-safe {
 		min-height: 100vh;
 		min-height: 100dvh;
+		min-height: var(--vh, 100vh);
 	}
 
 	/* Landscape orientation support */

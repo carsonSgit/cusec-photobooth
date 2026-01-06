@@ -10,6 +10,7 @@ import { flashVariants, photoThumbnailVariants } from "@/lib/animations";
 import { usePhotoboothStore } from "@/lib/store";
 
 export function CameraCapture() {
+	const orientation = usePhotoboothStore((state) => state.orientation);
 	const {
 		videoRef,
 		error,
@@ -18,12 +19,26 @@ export function CameraCapture() {
 		stopCamera,
 		switchCamera,
 		capturePhoto,
-	} = useCamera();
+	} = useCamera(orientation);
 	const { photos, addPhoto, setCurrentScreen, clearPhotos } =
 		usePhotoboothStore();
 	const [isCountingDown, setIsCountingDown] = useState(false);
 	const [flash, setFlash] = useState(false);
 	const [statusText, setStatusText] = useState("Get ready!");
+
+	// Safari-compatible viewport height fix
+	useEffect(() => {
+		const updateVh = () => {
+			document.documentElement.style.setProperty('--vh', `${window.innerHeight}px`);
+		};
+		updateVh();
+		window.addEventListener('resize', updateVh);
+		window.addEventListener('orientationchange', updateVh);
+		return () => {
+			window.removeEventListener('resize', updateVh);
+			window.removeEventListener('orientationchange', updateVh);
+		};
+	}, []);
 
 	useEffect(() => {
 		startCamera();

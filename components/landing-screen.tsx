@@ -47,7 +47,7 @@ export function LandingScreen() {
 						<Button
 							size="lg"
 							className="w-full mb-6 text-lg h-14 bg-white text-cusec-navy font-display font-semibold hover:bg-white/90"
-							onClick={() => setCurrentScreen("camera")}
+							onClick={() => setCurrentScreen("selection")}
 						>
 							Take Photos
 						</Button>

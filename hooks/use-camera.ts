@@ -1,26 +1,24 @@
 import { useCallback, useRef, useState } from "react";
+import type { Orientation } from "@/lib/store";
 
-export function useCamera() {
+export function useCamera(orientation: Orientation) {
 	const videoRef = useRef<HTMLVideoElement | null>(null);
 	const streamRef = useRef<MediaStream | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
-	const orientationQueryRef = useRef<MediaQueryList | null>(null);
-	const orientationHandlerRef = useRef<(() => void) | null>(null);
 	const [isStreaming, setIsStreaming] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
 
 	const getVideoConstraints = useCallback((currentFacingMode: "user" | "environment") => {
-		const isLandscape = window.matchMedia("(orientation: landscape)").matches;
+		// Use the user-selected orientation instead of auto-detecting
+		const isLandscape = orientation === "landscape";
 
-		// Request high resolution but don't force aspect ratio
-		// Let the camera use its native ratio to minimize cropping on various device screens
 		return {
 			facingMode: currentFacingMode,
 			width: { ideal: isLandscape ? 1920 : 1080, min: 640 },
 			height: { ideal: isLandscape ? 1080 : 1920, min: 480 },
 		};
-	}, []);
+	}, [orientation]);
 
 	const startCamera = useCallback(async () => {
 		// Cancel any previous camera start attempt
@@ -56,22 +54,6 @@ export function useCamera() {
 					// Only set streaming if not aborted
 					if (!abortController.signal.aborted) {
 						setIsStreaming(true);
-
-						// Set up orientation change listener
-						if (!orientationQueryRef.current) {
-							const orientationQuery = window.matchMedia("(orientation: landscape)");
-							const handleOrientationChange = () => {
-								stopCamera();
-								setTimeout(() => {
-									startCamera();
-								}, 100);
-							};
-
-							// Store handler reference for proper cleanup
-							orientationHandlerRef.current = handleOrientationChange;
-							orientationQuery.addEventListener("change", handleOrientationChange);
-							orientationQueryRef.current = orientationQuery;
-						}
 					}
 				} catch (playError) {
 					// AbortError is expected when component unmounts or camera restarts
@@ -100,13 +82,6 @@ export function useCamera() {
 		if (abortControllerRef.current) {
 			abortControllerRef.current.abort();
 			abortControllerRef.current = null;
-		}
-
-		// Clean up orientation listener
-		if (orientationQueryRef.current && orientationHandlerRef.current) {
-			orientationQueryRef.current.removeEventListener("change", orientationHandlerRef.current);
-			orientationQueryRef.current = null;
-			orientationHandlerRef.current = null;
 		}
 
 		if (streamRef.current) {
