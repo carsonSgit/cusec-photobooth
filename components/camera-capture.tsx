@@ -2,13 +2,50 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { SwitchCamera, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CountdownTimer } from "@/components/countdown-timer";
 import { Button } from "@/components/ui/button";
 import { useCamera } from "@/hooks/use-camera";
 import { flashVariants, photoThumbnailVariants } from "@/lib/animations";
 import { usePhotoboothStore } from "@/lib/store";
 import { generateSessionId } from "@/lib/supabase";
+
+// 🚨 TEMPORARY: Set to true to bypass camera and use placeholder images
+const DEV_SKIP_CAMERA = true;
+
+// Generate a placeholder image with a colored gradient
+function generatePlaceholderImage(index: number): string {
+	const canvas = document.createElement("canvas");
+	canvas.width = 640;
+	canvas.height = 480;
+	const ctx = canvas.getContext("2d");
+	if (!ctx) return "";
+	
+	// Different gradient colors for each photo
+	const colors = [
+		["#667eea", "#764ba2"],
+		["#f093fb", "#f5576c"],
+		["#4facfe", "#00f2fe"],
+	];
+	const [color1, color2] = colors[index % colors.length];
+	
+	const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+	gradient.addColorStop(0, color1);
+	gradient.addColorStop(1, color2);
+	ctx.fillStyle = gradient;
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	
+	// Add text
+	ctx.fillStyle = "white";
+	ctx.font = "bold 48px sans-serif";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(`Photo ${index + 1}`, canvas.width / 2, canvas.height / 2 - 30);
+	ctx.font = "24px sans-serif";
+	ctx.fillText("(Dev Mode)", canvas.width / 2, canvas.height / 2 + 30);
+	
+	return canvas.toDataURL("image/jpeg", 0.9);
+}
 
 export function CameraCapture() {
 	const orientation = usePhotoboothStore((state) => state.orientation);
@@ -23,16 +60,17 @@ export function CameraCapture() {
 	} = useCamera(orientation);
 	const { photos, addPhoto, setCurrentScreen, clearPhotos, sessionId, setSessionId } =
 		usePhotoboothStore();
+	const devPhotoCountRef = useRef(0);
+	const sessionIdGeneratedRef = useRef(false);
 	const [isCountingDown, setIsCountingDown] = useState(false);
 	const [flash, setFlash] = useState(false);
 	const [statusText, setStatusText] = useState("Get ready!");
 
-	// Generate session ID on mount
+	// Generate session ID on mount (with duplicate prevention for React Strict Mode)
 	useEffect(() => {
-		if (!sessionId) {
-			const newSessionId = generateSessionId();
-			setSessionId(newSessionId);
-			console.log("[Session] Generated session ID:", newSessionId);
+		if (!sessionId && !sessionIdGeneratedRef.current) {
+			sessionIdGeneratedRef.current = true;
+			setSessionId(generateSessionId());
 		}
 	}, [sessionId, setSessionId]);
 
@@ -51,10 +89,12 @@ export function CameraCapture() {
 	}, []);
 
 	useEffect(() => {
-		startCamera();
-		return () => {
-			stopCamera();
-		};
+		if (!DEV_SKIP_CAMERA) {
+			startCamera();
+			return () => {
+				stopCamera();
+			};
+		}
 	}, [startCamera, stopCamera]);
 
 	const startCountdown = useCallback(() => {
@@ -74,7 +114,9 @@ export function CameraCapture() {
 		} else if (photos.length === 3) {
 			setStatusText("All done! Processing...");
 			setTimeout(() => {
-				stopCamera();
+				if (!DEV_SKIP_CAMERA) {
+					stopCamera();
+				}
 				setCurrentScreen("save");
 			}, 1000);
 		}
@@ -82,7 +124,16 @@ export function CameraCapture() {
 
 	const handleCountdownComplete = useCallback(() => {
 		setIsCountingDown(false);
-		const photo = capturePhoto();
+		
+		let photo: string | null;
+		if (DEV_SKIP_CAMERA) {
+			// Dev mode: use placeholder image
+			photo = generatePlaceholderImage(devPhotoCountRef.current);
+			devPhotoCountRef.current++;
+		} else {
+			photo = capturePhoto();
+		}
+		
 		if (photo) {
 			setFlash(true);
 			setTimeout(() => setFlash(false), 400);
@@ -91,12 +142,14 @@ export function CameraCapture() {
 	}, [capturePhoto, addPhoto]);
 
 	const handleCancel = () => {
-		stopCamera();
+		if (!DEV_SKIP_CAMERA) {
+			stopCamera();
+		}
 		clearPhotos();
 		setCurrentScreen("landing");
 	};
 
-	if (error) {
+	if (error && !DEV_SKIP_CAMERA) {
 		return (
 			<div className="h-screen-safe bg-black flex items-center justify-center p-4">
 				<div className="text-center text-white">
@@ -109,14 +162,23 @@ export function CameraCapture() {
 
 	return (
 		<div className="h-screen-safe bg-black relative overflow-hidden overflow-locked landscape:flex landscape:items-center landscape:justify-center">
-			<video
-				ref={videoRef}
-				className={`absolute inset-0 w-full h-full object-cover ${
-					facingMode === "user" ? "scale-x-[-1]" : ""
-				}`}
-				playsInline
-				muted
-			/>
+			{DEV_SKIP_CAMERA ? (
+				<div className="absolute inset-0 w-full h-full bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center">
+					<div className="text-white text-center">
+						<p className="text-2xl font-bold mb-2">📷 Dev Mode</p>
+						<p className="text-sm opacity-75">Camera bypassed</p>
+					</div>
+				</div>
+			) : (
+				<video
+					ref={videoRef}
+					className={`absolute inset-0 w-full h-full object-cover ${
+						facingMode === "user" ? "scale-x-[-1]" : ""
+					}`}
+					playsInline
+					muted
+				/>
+			)}
 
 			<AnimatePresence>
 				{flash && (

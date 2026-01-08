@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { CheckCircle2, Download, RotateCcw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CusecBackground } from "@/components/cusec-background";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -31,6 +31,9 @@ export function SaveOptions() {
 	const [downloaded, setDownloaded] = useState(false);
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	
+	// Ref to prevent duplicate uploads (React Strict Mode double-render)
+	const uploadInitiatedRef = useRef(false);
 
 	const orientation = usePhotoboothStore((state) => state.orientation);
 
@@ -42,8 +45,9 @@ export function SaveOptions() {
 					setPhotoStrip(strip);
 					setIsGenerating(false);
 
-					// Trigger background upload to Supabase
-					if (sessionId && uploadStatus === "idle") {
+					// Trigger background upload to Supabase (with duplicate prevention)
+					if (sessionId && uploadStatus === "idle" && !uploadInitiatedRef.current) {
+						uploadInitiatedRef.current = true;
 						setUploadStatus("uploading");
 						uploadPhotoSession({
 							sessionId,
@@ -54,10 +58,8 @@ export function SaveOptions() {
 							.then((result) => {
 								if (result.success) {
 									setUploadStatus("success");
-									console.log("[Upload] Session archived successfully");
 								} else {
 									setUploadStatus("error");
-									console.error("[Upload] Failed:", result.error);
 								}
 							})
 							.catch((err) => {
