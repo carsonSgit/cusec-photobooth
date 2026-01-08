@@ -141,12 +141,13 @@ export function SaveOptions() {
 
 			if (response.ok) {
 				setSendStatus("success");
-				setEmail("");
-
-				// Update email in database if session was uploaded
-				if (sessionId && uploadStatus === "success") {
+				
+				// Update email in database
+				if (sessionId) {
 					await updateSessionEmail(sessionId, email);
 				}
+				
+				setEmail("");
 			} else {
 				setSendStatus("error");
 			}

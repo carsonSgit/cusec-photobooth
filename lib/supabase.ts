@@ -212,12 +212,13 @@ export async function updateSessionEmail(
 	if (!supabase) return false;
 
 	try {
-		const { error } = await supabase
+		const { data, error } = await supabase
 			.from("photo_sessions")
 			.update({ email })
-			.eq("session_id", sessionId);
+			.eq("session_id", sessionId)
+			.select();
 
-		return !error;
+		return !error && data && data.length > 0;
 	} catch {
 		return false;
 	}

@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 		const buffer = Buffer.from(base64Data, "base64");
 
 		const { data, error } = await resend.emails.send({
-			from: process.env.FROM_EMAIL || "onboarding@resend.dev",
+			from: process.env.FROM_EMAIL!,
 			to: email,
 			subject: "Your CUSEC 2026 Photobooth Memories! 📸",
 			html: `
