@@ -10,9 +10,18 @@ import { Input } from "@/components/ui/input";
 import { pageVariants } from "@/lib/animations";
 import { generatePhotoStrip } from "@/lib/canvas";
 import { usePhotoboothStore } from "@/lib/store";
+import { uploadPhotoSession, updateSessionEmail } from "@/lib/supabase";
 
 export function SaveOptions() {
-	const { photos, photoStrip, setPhotoStrip, reset } = usePhotoboothStore();
+	const {
+		photos,
+		photoStrip,
+		setPhotoStrip,
+		reset,
+		sessionId,
+		uploadStatus,
+		setUploadStatus,
+	} = usePhotoboothStore();
 	const [email, setEmail] = useState("");
 	const [isSending, setIsSending] = useState(false);
 	const [sendStatus, setSendStatus] = useState<"idle" | "success" | "error">(
@@ -32,6 +41,30 @@ export function SaveOptions() {
 				.then((strip) => {
 					setPhotoStrip(strip);
 					setIsGenerating(false);
+
+					// Trigger background upload to Supabase
+					if (sessionId && uploadStatus === "idle") {
+						setUploadStatus("uploading");
+						uploadPhotoSession({
+							sessionId,
+							photos,
+							photoStrip: strip,
+							orientation,
+						})
+							.then((result) => {
+								if (result.success) {
+									setUploadStatus("success");
+									console.log("[Upload] Session archived successfully");
+								} else {
+									setUploadStatus("error");
+									console.error("[Upload] Failed:", result.error);
+								}
+							})
+							.catch((err) => {
+								setUploadStatus("error");
+								console.error("[Upload] Error:", err);
+							});
+					}
 				})
 				.catch((err) => {
 					console.error("Error generating photo strip:", err);
@@ -39,7 +72,7 @@ export function SaveOptions() {
 					setIsGenerating(false);
 				});
 		}
-	}, [photos, photoStrip, setPhotoStrip, orientation]);
+	}, [photos, photoStrip, setPhotoStrip, orientation, sessionId, uploadStatus, setUploadStatus]);
 
 	const handleDownload = async () => {
 		if (!photoStrip) return;
@@ -107,6 +140,11 @@ export function SaveOptions() {
 			if (response.ok) {
 				setSendStatus("success");
 				setEmail("");
+
+				// Update email in database if session was uploaded
+				if (sessionId && uploadStatus === "success") {
+					await updateSessionEmail(sessionId, email);
+				}
 			} else {
 				setSendStatus("error");
 			}

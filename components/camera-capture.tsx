@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useCamera } from "@/hooks/use-camera";
 import { flashVariants, photoThumbnailVariants } from "@/lib/animations";
 import { usePhotoboothStore } from "@/lib/store";
+import { generateSessionId } from "@/lib/supabase";
 
 export function CameraCapture() {
 	const orientation = usePhotoboothStore((state) => state.orientation);
@@ -20,11 +21,20 @@ export function CameraCapture() {
 		switchCamera,
 		capturePhoto,
 	} = useCamera(orientation);
-	const { photos, addPhoto, setCurrentScreen, clearPhotos } =
+	const { photos, addPhoto, setCurrentScreen, clearPhotos, sessionId, setSessionId } =
 		usePhotoboothStore();
 	const [isCountingDown, setIsCountingDown] = useState(false);
 	const [flash, setFlash] = useState(false);
 	const [statusText, setStatusText] = useState("Get ready!");
+
+	// Generate session ID on mount
+	useEffect(() => {
+		if (!sessionId) {
+			const newSessionId = generateSessionId();
+			setSessionId(newSessionId);
+			console.log("[Session] Generated session ID:", newSessionId);
+		}
+	}, [sessionId, setSessionId]);
 
 	// Safari-compatible viewport height fix
 	useEffect(() => {
