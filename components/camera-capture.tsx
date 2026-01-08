@@ -108,7 +108,7 @@ export function CameraCapture() {
 	}
 
 	return (
-		<div className="h-screen-safe bg-black relative overflow-hidden overflow-locked landscape:flex landscape:items-center landscape:justify-center">
+		<div className="h-screen-safe bg-black relative overflow-hidden overflow-locked">
 			<video
 				ref={videoRef}
 				className={`absolute inset-0 w-full h-full object-cover ${
@@ -138,9 +138,10 @@ export function CameraCapture() {
 				<CountdownTimer onComplete={handleCountdownComplete} />
 			)}
 
-			<div className="absolute top-4 left-4 right-4 z-30 flex justify-between items-start landscape:top-2 landscape:left-2 landscape:right-2">
+			{/* Top bar - photo count and close button */}
+			<div className="absolute top-4 left-4 right-4 z-30 flex justify-between items-start landscape:top-2">
 				<motion.div
-					className="glass-dark text-white px-4 py-2 rounded-full shadow-premium font-display font-semibold"
+					className="glass-dark text-white px-4 py-2 rounded-full shadow-premium font-display font-semibold landscape:px-3 landscape:py-1.5 landscape:text-sm"
 					initial={{ opacity: 0, y: -20 }}
 					animate={{ opacity: 1, y: 0 }}
 				>
@@ -149,15 +150,16 @@ export function CameraCapture() {
 				<Button
 					variant="ghost"
 					size="icon"
-					className="glass-dark text-white hover:bg-white/20"
+					className="glass-dark text-white hover:bg-white/20 w-10 h-10 landscape:w-8 landscape:h-8"
 					onClick={handleCancel}
 				>
-					<X className="h-6 w-6" />
+					<X className="h-6 w-6 landscape:h-5 landscape:w-5" />
 				</Button>
 			</div>
 
+			{/* Photo thumbnails */}
 			{photos.length > 0 && (
-				<div className="absolute top-20 left-4 right-4 z-30 flex gap-2 overflow-x-auto landscape:top-2 landscape:left-20 landscape:right-auto landscape:flex-col landscape:max-h-[calc(100vh-8rem)]">
+				<div className="absolute top-20 left-4 right-4 z-30 flex gap-2 overflow-x-auto landscape:top-12">
 					{photos.map((photo, index) => (
 						<motion.div
 							key={photo}
@@ -166,16 +168,16 @@ export function CameraCapture() {
 							animate="animate"
 							className="relative shrink-0"
 						>
-							<div className="w-20 h-20 rounded-xl overflow-hidden shadow-premium-lg border-2 border-white/50 landscape:w-16 landscape:h-16">
+							<div className="w-16 h-16 landscape:w-12 landscape:h-12 rounded-xl overflow-hidden shadow-premium-lg border-2 border-white/50">
 								<img
 									src={photo}
 									alt={`Captured ${index + 1} of 3`}
 									className="w-full h-full object-cover"
 								/>
 							</div>
-							<div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+							<div className="absolute -top-1 -right-1 w-5 h-5 landscape:w-4 landscape:h-4 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
 								<svg
-									className="w-4 h-4 text-white"
+									className="w-3 h-3 landscape:w-2.5 landscape:h-2.5 text-white"
 									fill="none"
 									viewBox="0 0 24 24"
 									stroke="currentColor"
@@ -195,11 +197,12 @@ export function CameraCapture() {
 				</div>
 			)}
 
-			<div className="absolute bottom-4 left-4 right-4 z-30 flex flex-col items-center gap-4 landscape:bottom-2 landscape:left-auto landscape:right-2">
+			{/* Bottom controls - status and camera switch */}
+			<div className="absolute bottom-4 left-4 right-4 z-30 flex flex-col items-center gap-3 landscape:bottom-2 landscape:gap-2">
 				<AnimatePresence mode="wait">
 					<motion.p
 						key={statusText}
-						className="glass-dark text-white text-lg font-display font-semibold px-6 py-3 rounded-full shadow-premium"
+						className="glass-dark text-white text-base font-display font-semibold px-5 py-2.5 rounded-full shadow-premium landscape:text-sm landscape:px-4 landscape:py-2"
 						initial={{ opacity: 0, y: 10 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -10 }}
@@ -210,10 +213,10 @@ export function CameraCapture() {
 				<Button
 					variant="ghost"
 					size="icon"
-					className="glass-dark text-white hover:bg-white/20"
+					className="glass-dark text-white hover:bg-white/20 w-11 h-11 landscape:w-9 landscape:h-9"
 					onClick={switchCamera}
 				>
-					<SwitchCamera className="h-6 w-6" />
+					<SwitchCamera className="h-5 w-5 landscape:h-4 landscape:w-4" />
 				</Button>
 			</div>
 		</div>

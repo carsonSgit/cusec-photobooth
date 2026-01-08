@@ -86,7 +86,7 @@ function OrientationCard({
 }: OrientationCardProps) {
 	return (
 		<motion.button
-			className="group relative w-full p-6 rounded-2xl glass-dark border border-white/10 hover:border-white/30 transition-colors cursor-pointer text-left"
+			className="group relative w-full p-6 landscape:p-4 rounded-2xl glass-dark border border-white/10 hover:border-white/30 transition-colors cursor-pointer text-left"
 			variants={cardVariants}
 			initial="initial"
 			animate="animate"
@@ -99,7 +99,7 @@ function OrientationCard({
 			<div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
 			{/* Preview */}
-			<div className="relative z-10 mb-4">
+			<div className="relative z-10 mb-4 landscape:mb-2">
 				{orientation === "portrait" ? (
 					<PortraitCameraPreview />
 				) : (
@@ -109,10 +109,10 @@ function OrientationCard({
 
 			{/* Label */}
 			<div className="relative z-10 text-center">
-				<h3 className="text-xl font-display font-bold text-white mb-1">
+				<h3 className="text-xl font-display font-bold text-white mb-1 landscape:text-lg">
 					{label}
 				</h3>
-				<p className="text-sm text-white/70 font-sans">{description}</p>
+				<p className="text-sm text-white/70 font-sans landscape:text-xs">{description}</p>
 			</div>
 
 			{/* Selection indicator */}

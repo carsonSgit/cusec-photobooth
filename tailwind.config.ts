@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import plugin from "tailwindcss/plugin";
 
 const config: Config = {
 	darkMode: ["class"],
@@ -127,6 +128,13 @@ const config: Config = {
 			},
 		},
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"),
+		// Custom landscape variant - only for mobile devices in landscape orientation
+		// Targets landscape orientation with max-height to exclude desktop
+		plugin(({ addVariant }) => {
+			addVariant("landscape", "@media (orientation: landscape) and (max-height: 500px)");
+		}),
+	],
 };
 export default config;
